@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tool Atlas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #08080d;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --border: #252535;
+  --text: #e8e8f0;
+  --text-dim: #7878a0;
+  --accent: #7c6aef;
+  --accent-glow: #7c6aef40;
+  --accent2: #22d3b8;
+  --accent3: #f472b6;
+  --hover: #1e1e2e;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, #7c6aef08 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.header {
+  padding: 52px 40px 36px;
+  text-align: center;
+  position: relative;
+  z-index:1;
+}
+
+.header h1 {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #fff 0%, #7c6aef 60%, #22d3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+
+.header p {
+  color: var(--text-dim);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.header .stats {
+  margin-top: 14px;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.header .stats span {
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+.cat-wrap {
+  padding: 24px 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+
+.cat-wrap::after {
+  content:'';
+  position:absolute;
+  bottom:-24px; left:0; right:0;
+  height:24px;
+  background: linear-gradient(var(--bg), transparent);
+  pointer-events:none;
+}
+
+.cats {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 18px;
+  scrollbar-width: none;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.cats::-webkit-scrollbar { display:none; }
+
+.cat-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cat-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.cat-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 24px var(--accent-glow);
+  font-weight: 600;
+}
+
+.cat-btn .cnt {
+  background: #ffffff12;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+.cat-btn.active .cnt { background: #ffffff28; }
+
+.main {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+}
+
+.grid.appear {
+  animation: fadeUp 0.35s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  color: var(--text);
+}
+
+.tool-btn:hover {
+  border-color: var(--accent);
+  background: var(--hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px #00000050;
+}
+
+.t-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.t-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.t-logo .fb {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.t-info h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.t-info .sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* Overlay + Panel */
+.ov {
+  position:fixed; inset:0;
+  background: #000000a0;
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.3s;
+}
+.ov.show { opacity:1; pointer-events:all; }
+
+.panel {
+  position:fixed; top:0; right:0;
+  width: min(580px, 100vw);
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 1001;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.panel.show { transform: translateX(0); }
+
+.p-head {
+  padding: 24px 24px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: sticky; top:0;
+  background: var(--surface);
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+
+.p-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.p-logo {
+  width: 50px; height: 50px;
+  border-radius: 14px;
+  background: var(--surface2);
+  display:flex; align-items:center; justify-content:center;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink:0;
+}
+
+.p-logo img {
+  width:100%; height:100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.p-logo .fb {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.p-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.p-title .id-tag {
+  font-size: 13px;
+  color: var(--accent2);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.p-acts {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.visit {
+  display:flex; align-items:center; gap:5px;
+  padding: 9px 16px;
+  background: var(--accent);
+  color: #fff;
+  border:none; border-radius:10px;
+  font-size: 13px; font-weight: 600;
+  cursor:pointer; transition: all 0.2s;
+  font-family: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.visit:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.close {
+  width:36px; height:36px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--text-dim);
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 16px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.close:hover { background: var(--border); color: var(--text); }
+
+.p-body {
+  padding: 22px 24px 48px;
+}
+
+.sec {
+  margin-bottom: 22px;
+}
+
+.sec .lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sec .lbl .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.sec .val {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: #c0c0d4;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  word-break: keep-all;
+  white-space: pre-wrap;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 6px 14px;
+  background: #ffffff06;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tag.price {
+  border-color: var(--accent2);
+  color: var(--accent2);
+  background: #22d3b808;
+}
+
+.tag.prompt {
+  border-color: var(--accent3);
+  color: var(--accent3);
+  background: #f472b608;
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-dim);
+}
+
+.empty .ic { font-size: 48px; margin-bottom: 14px; opacity: 0.4; }
+
+@media (max-width: 640px) {
+  .header { padding: 28px 16px 24px; }
+  .header h1 { font-size: 30px; }
+  .cat-wrap { padding: 14px 10px 0; }
+  .cats { justify-content: flex-start; flex-wrap: nowrap; }
+  .main { padding: 16px 10px 40px; }
+  .grid { grid-template-columns: 1fr; }
+  .panel { width: 100vw; }
+  .p-head { padding: 18px 14px 14px; }
+  .p-body { padding: 16px 14px 32px; }
+  .p-acts { flex-direction: column; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI Tool Atlas</h1>
+  <p>분야별 AI 도구를 탐색하고, 각 도구의 특징을 한눈에 확인하세요</p>
+  <div class="stats">
+    <div><span id="totalTools">0</span> 개 도구</div>
+    <div><span id="totalCats">0</span> 개 분야</div>
+  </div>
+</div>
+
+<div class="cat-wrap">
+  <div class="cats" id="cats"></div>
+</div>
+
+<div class="main">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="ov" id="ov"></div>
+<div class="panel" id="panel">
+  <div class="p-head">
+    <div class="p-left">
+      <div class="p-logo" id="pLogo"></div>
+      <div class="p-title">
+        <h2 id="pName"></h2>
+        <div class="id-tag" id="pId"></div>
+      </div>
+    </div>
+    <div class="p-acts">
+      <a class="visit" id="visitBtn" href="#" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        바로가기
+      </a>
+      <button class="close" id="closeBtn">✕</button>
+    </div>
+  </div>
+  <div class="p-body" id="pBody"></div>
+</div>
+
+<script>
+const D=[{"c":"바이브 코딩","n":"Aider","i":"터미널 AI","s":"Git 연계 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"CLI 부담 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"고급 사용자","pf":"명령형","p":"무료","pl":"오픈소스","pe":"","id":"aider","u":"https://aider.chat"},{"c":"시각화 / PPT","n":"AiPPT","i":"문서 변환 PPT 도구","s":"워드(Word)나 PDF 파일을 업로드하면 PPT 포맷으로 그대로 변환해줌.","w":"Gamma보다 디자인 자유도는 낮을 수 있음.","r":"이미 있는 보고서를 PPT로 빠르게 옮겨야 할 때.","pf":"[파일 업로드] 텍스트 입력보다 문서 업로드 기능 활용.","p":"부분 유료 (Credit)","pl":"무료 체험 크레딧 제공. 이후 월 구독이나 건당 결제 필요.","pe":"","id":"aippt","u":"https://www.aippt.com"},{"c":"음악 생성","n":"AIVA","i":"작곡 AI","s":"클래식 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"대중성 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"BGM","pf":"스타일","p":"유료","pl":"구독","pe":"","id":"aiva","u":"https://www.aiva.ai"},{"c":"만화·스토리보드","n":"Anifusion","i":"AI 망가","s":"스타일 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"편집 약함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"망가 제작","pf":"스타일 태그","p":"유료","pl":"크레딧","pe":"","id":"anifusion","u":"https://anifusion.ai"},{"c":"자동화·AI 에이전트","n":"Bardeen","i":"","s":"브라우저 내 에이전트가 반복 업무 대행","w":"클라우드 실행보다 로컬 브라우저 의존적","r":"웹 페이지의 데이터를 즉시 엑셀/노션으로 옮길 때","pf":"[Input] 현재 채용 페이지에서 [Action] 후보자 명단을 엑셀로 바로 추출해줘.","p":"Freemium","pl":"로컬 실행 무료, 자동화 실행 유료","pe":"","id":"bardeen","u":"https://www.bardeen.ai"},{"c":"음악 생성","n":"Beatoven","i":"BGM AI","s":"길이 조절 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"장르 제한 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"영상","pf":"타임라인","p":"유료","pl":"구독","pe":"","id":"beatoven","u":"https://www.beatoven.ai"},{"c":"음악 생성","n":"Boomy","i":"간편 음악","s":"속도 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"완성도 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"데모","pf":"장르","p":"Freemium","pl":"유료","pe":"","id":"boomy","u":"https://boomy.com"},{"c":"만화·스토리보드","n":"Boords","i":"스토리보드","s":"기획 특화 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"창작 한계 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"영상 기획","pf":"장면 지시","p":"유료","pl":"팀 플랜","pe":"","id":"boords","u":"https://boords.com"},{"c":"시각화 / PPT","n":"Canva","i":"디자인 템플릿 허브","s":"압도적인 템플릿 수. Magic Design으로 텍스트에 맞는 디자인 추천.","w":"내용의 논리적 구조보다는 비주얼 꾸미기에 치중.","r":"감성적인 발표 자료, 포스터, SNS 게시물.","pf":"[분위기 묘사] \"봄 느낌 나는 따뜻한 핑크톤 템플릿.\"","p":"부분 유료 (Freemium)","pl":"무료로도 충분히 강력함. Pro 사용 시 프리미엄 소스(사진/아이콘) 무제한, 배경 제거, 크기 자동 조절 기능 사용 가능.","pe":"","id":"canva","u":"https://www.canva.com"},{"c":"영상 생성·편집","n":"CapCut","i":"편집 툴","s":"자막 강점 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"창작 한계 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"숏폼","pf":"템플릿","p":"무료","pl":"무료","pe":"","id":"capcut","u":"https://www.capcut.com"},{"c":"음성 합성","n":"Cartesia","i":"","s":"0.1초 내외의 초저지연 실시간 합성","w":"ElevenLabs 대비 감정의 폭이 좁음","r":"응답 속도가 중요한 실시간 AI 상담 서비스 구축 시","pf":"[Role] 실시간 상담원으로서 [Instruction] 텍스트를 지연 없이 자연스럽게 읽어줘.","p":"Paid (Trial)","pl":"지연시간 최적화 기업용 API 중심","pe":"","id":"cartesia","u":"https://cartesia.ai"},{"c":"캐릭터 챗봇","n":"Character.ai","i":"","s":"독보적인 서사 유지 및 팬덤 커뮤니티","w":"강한 검열로 인해 표현의 한계가 있음","r":"특정 인물이나 가상 캐릭터와 대화하고 싶을 때","pf":"[Persona] 셜록 홈즈로서 [Action] 대화 중 상대의 모순을 논리적으로 파고들어줘.","p":"Free","pl":"기본 무료, 대기열 패스 유료(Plus)","pe":"","id":"characterai","u":"https://character.ai"},{"c":"글쓰기·정리","n":"ChatGPT (OpenAI)","i":"범용 LLM 작업 파트너","s":"음성 모드(Voice)와 GPTs 생태계. 코딩, 이미지, 분석을 한 채팅방에서 가장 유연하게 처리.","w":"최신 정보 반영 속도가 검색 전용 툴보다 느림. 할루시네이션 존재.","r":"아이디어 발상, 초안, 종합 업무","pf":"페르소나·단계 프롬프트","p":"Freemium","pl":"Free / Plus ($20/월)","pe":"\"10년차 에디터 페르소나로, 이 회의록을 CEO 보고용 A4 1장 불렛포인트로 요약해줘.\"","id":"chatgpt","u":"https://chat.openai.com"},{"c":"글쓰기·정리","n":"Claude","i":"장문 특화 AI 작가","s":"가장 자연스러운 한국어 작문. 긴 문맥(Context)을 이해하며 문학적/논리적 글쓰기에 최적.","w":"웹 검색 기능이 약하고, 사용량 제한(메시지 횟수)이 경쟁사 대비 엄격함.","r":"보고서 작성, 논문 분석, 긴 글","pf":"톤 유지 프롬프트","p":"Freemium","pl":"Free / Pro ($20/월)","pe":"\"이 50p 논문을 읽고 서론-본론-결론 구조로 요약하고, 핵심 주장의 논리적 허점을 찾아줘.\"","id":"claude","u":"https://claude.ai"},{"c":"모델 & 추론","n":"Claude 3.5/4","i":"","s":"인간적인 문체 및 방대한 문서 분석 능력","w":"하루 사용량 제한이 경쟁사 대비 엄격함","r":"긴 문서를 요약하거나 자연스러운 초안 작성 시","pf":"[Input] 보고서의 [Objective] 핵심 인사이트를 도출하고 [Tone] 비즈니스 메일 톤 요약해줘.","p":"Freemium","pl":"Pro 구독(월 $20) 시 사용량 증가","pe":"","id":"claude354","u":"https://claude.ai"},{"c":"바이브 코딩","n":"Codeium","i":"코드 AI","s":"무료 자동완성 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"대형 프로젝트 약함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"보조 코딩","pf":"명령 프롬프트","p":"무료","pl":"무료","pe":"","id":"codeium","u":"https://codeium.com"},{"c":"만화·스토리보드","n":"ComfyUI","i":"로컬 파이프","s":"컨트롤 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"설정 복잡 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"고급 제작","pf":"노드","p":"무료","pl":"오픈소스","pe":"","id":"comfyui","u":"https://www.comfy.org"},{"c":"글쓰기·정리","n":"Consensus","i":"","s":"논문 인용(Citation) 기반의 높은 신뢰도","w":"최신 시사나 트렌드 데이터는 부족함","r":"과학적 근거가 필요한 학술적 보고서 작성 시","pf":"[Objective] 의학 주제에 대해 [Constraint] 동료 검토 논문만 요약해서 근거 제시해줘.","p":"Freemium","pl":"AI 검색 무료, 요약 및 필터 유료","pe":"","id":"consensus","u":"https://consensus.app"},{"c":"웹 / UI / UX","n":"Creatie","i":"AI 네이티브 디자인 툴","s":"피그마와 비슷하지만, '마법봉' 기능으로 아이콘 생성, 이미지 채우기 등 AI 기능이 내장됨.","w":"아직 피그마만큼 플러그인 생태계가 크지 않음.","r":"AI 도움을 받으며 디자인 실무를 하고 싶을 때.","pf":"[자동 생성] \"이 영역에 어울리는 아이콘 세트 만들어줘.\"","p":"무료 (Beta/Early Access)","pl":"현재 초기 단계라 대부분의 프로 기능이 무료로 제공됨. (가장 혜자스러운 시기)","pe":"","id":"creatie","u":"https://creatie.ai"},{"c":"자동화·AI 에이전트","n":"CrewAI","i":"멀티 에이전트","s":"역할 분담 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"개발자용 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"복합 작업","pf":"에이전트 역할","p":"무료","pl":"오픈소스","pe":"","id":"crewai","u":"https://www.crewai.com"},{"c":"바이브 코딩","n":"Cursor","i":"AI IDE","s":"VS Code 포크 기반의 압도적 UX. 'Composer' 기능으로 여러 파일을 동시에 수정하고, 터미널 명령어까지 자연어로 제어.","w":"사실상 유료(Pro)를 써야만 제대로 된 성능(Claude 3.5 Sonnet 등)을 체감 가능.","r":"Free: 기본 모델 제한적 사용\nPro($20/월): Claude 3.5 Sonnet, GPT-4o 고속 모드, 무제한 자동완성","pf":"자연어 수정","p":"Freemium","pl":"Free: 기본 모델 제한적 사용\nPro($20/월): Claude 3.5 Sonnet, GPT-4o 고속 모드, 무제한 자동완성","pe":"(Cmd+K) \"이 auth.ts 파일의 로그인 함수를 리팩토링해줘. 에러 처리를 try-catch 블록으로 감싸고, 로그를 파일로 저장하도록 수정해.\"","id":"cursor","u":"https://cursor.sh"},{"c":"만화·스토리보드","n":"Dashtoon","i":"AI 만화","s":"패널 일관성 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"장르 제한 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"웹툰","pf":"스토리 지시","p":"유료","pl":"구독","pe":"","id":"dashtoon","u":"https://dashtoon.com"},{"c":"번역 & 검색","n":"DeepL","i":"","s":"문맥 보존 및 비즈니스 뉘앙스 최적화","w":"지원 언어 수가 경쟁사 대비 적음","r":"격식 있는 비즈니스 메일이나 계약서 번역 시","pf":"[Role] 전문 번역가로서 [Target] 한국 IT 타겟에 맞춰 [Constraint] 구어체로 번역해줘.","p":"Freemium","pl":"무료 제한적, 유료(Pro) 보안 및 무제한 번역","pe":"","id":"deepl","u":"https://www.deepl.com"},{"c":"영상 생성·편집","n":"Descript","i":"텍스트 편집","s":"오디오 강점 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"영상 제한 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"팟캐스트","pf":"스크립트","p":"Freemium","pl":"Pro","pe":"","id":"descript","u":"https://www.descript.com"},{"c":"자동화·AI 에이전트","n":"Dify","i":"에이전트 빌더","s":"RAG 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"초기 설정 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"챗봇","pf":"역할 지시","p":"무료/유료","pl":"클라우드","pe":"","id":"dify","u":"https://dify.ai"},{"c":"웹 / UI / UX","n":"Dora","i":"3D 인터랙티브 웹","s":"화려한 3D 효과와 애니메이션이 들어간 사이트 생성.","w":"정보 전달 위주의 정적인 사이트에는 과할 수 있음.","r":"브랜드 홍보용, 제품 쇼케이스 사이트.","pf":"[효과 묘사] \"스크롤하면 제품이 회전하며 줌인되는 효과.\"","p":"부분 유료 (Freemium)","pl":"무료 버전은 Dora 워터마크가 찍힘. 유료 사용 시 워터마크 제거 및 커스텀 도메인 연결 가능.","pe":"","id":"dora","u":"https://www.dora.run"},{"c":"음성 합성","n":"ElevenLabs","i":"","s":"인간적 디테일(숨소리 등) 표현 정점","w":"한국어 발음 시 미세한 영어 억양 잔존","r":"고품질 오디오북이나 몰입감 있는 나레이션 제작 시","pf":"[Tone] 나레이션 톤으로 [Control] 문장 사이 호흡(Pause)을 길게 두어 긴장감 조성해줘.","p":"Freemium","pl":"글자 수(Character) 기반 과금","pe":"","id":"elevenlabs","u":"https://elevenlabs.io"},{"c":"글쓰기·정리","n":"Elicit","i":"","s":"논문 데이터 자동 요약 및 테이블화","w":"학술 자료 외 일반 검색은 불가능함","r":"수천 개의 논문을 분석하여 데이터로 정리할 때","pf":"[Query] 연구 주제 관련 논문을 찾고 [Format] 실험 대상과 결과 수치별로 정리해줘.","p":"Freemium","pl":"크레딧 기반 심화 분석 제공","pe":"","id":"elicit","u":"https://elicit.com"},{"c":"회의·기록","n":"Fathom","i":"회의 요약","s":"무료 강점 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"기능 단순 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"미팅 요약","pf":"자동 요약","p":"무료","pl":"무료","pe":"","id":"fathom","u":"https://fathom.video"},{"c":"글쓰기·정리","n":"Felo (검색)","i":"다국어 리서치 에이전트","s":"일본어/영어 문서를 한국어로 완벽하게 번역해 찾아줌. 마인드맵 생성 기능 보유.","w":"아직 인지도가 낮고 UI가 낯설 수 있음.","r":"해외(특히 일본/미국) 현지 반응 조사, 논문 교차 검증.","pf":"[언어 설정] \"일본 현지 사이트 반응 위주로 찾아줘.\"","p":"무료 (Beta)","pl":"현재 대부분의 기능을 무료로 사용 가능. (추후 유료화 가능성 있음)","pe":"","id":"felo","u":"https://felo.ai"},{"c":"웹 / UI / UX","n":"Figma (+AI)","i":"전문가용 표준 툴","s":"디자이너 협업 표준. AI 플러그인으로 반복 작업 자동화. 수정 자유도 100%.","w":"비전공자가 쓰기엔 진입장벽이 높음.","r":"개발자에게 넘길 최종 디자인(High-Fidelity) 작업.","pf":"[명령] \"이 버튼들 간격 일정하게 맞춰줘(Auto Layout).\"","p":"부분 유료 (Freemium)","pl":"무료로도 개인 작업 충분. 유료(Pro)는 'Dev Mode(개발자 모드)' 및 팀 라이브러리 공유 기능 제공.","pe":"","id":"figma","u":"https://www.figma.com"},{"c":"유틸리티","n":"Firecrawl","i":"","s":"웹사이트를 LLM용 마크다운으로 즉시 변환","w":"스캔 비용 발생 및 대규모 작업 시 부담","r":"AI 학습을 위해 웹 데이터를 구조화하여 수집할 때","pf":"[Input] URL 내에서 [Filter] 핵심 데이터만 추출해서 [Format] JSON 구조로 정리해줘.","p":"Freemium","pl":"API 호출 횟수 기반 과제","pe":"","id":"firecrawl","u":"https://www.firecrawl.dev"},{"c":"회의·기록","n":"Fireflies.ai","i":"회의 요약","s":"검색·공유 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"UI 복잡 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"팀 회의","pf":"액션 지시","p":"Freemium","pl":"유료","pe":"","id":"firefliesai","u":"https://fireflies.ai"},{"c":"자동화·AI 에이전트","n":"Flowise","i":"에이전트","s":"시각적 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"대형 제한 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"실험","pf":"노드","p":"무료","pl":"오픈소스","pe":"","id":"flowise","u":"https://flowiseai.com"},{"c":"웹 / UI / UX","n":"Framer","i":"디자이너를 위한 웹 빌더","s":"디자인 툴처럼 그리면 실제 웹사이트로 배포됨. 피그마와 사용성 유사.","w":"완전 초보자보다는 디자인 툴 사용 경험이 있는 사람에게 적합.","r":"고퀄리티 포트폴리오 사이트 제작.","pf":"[스타일 지정] \"미니멀하고 인터랙션이 많은 스타일로 변환해줘.\"","p":"부분 유료 (Freemium)","pl":"무료 버전도 사이트 제작 가능하지만, 커스텀 도메인(내 주소) 연결 및 방문자 수가 많아지면 유료 필요.","pe":"","id":"framer","u":"https://www.framer.com"},{"c":"웹 / UI / UX","n":"Galileo","i":"텍스트 to 모바일 UI","s":"텍스트 설명만으로 고퀄리티 모바일 앱 화면 세트를 생성.","w":"생성 후 세밀한 레이아웃 수정이 어려움.","r":"디자인 레퍼런스(참고 자료)를 빠르게 여러 개 뽑을 때.","pf":"[상세 묘사] \"로그인 화면, 회원가입 화면, 홈 화면 세트로 그려줘.\"","p":"유료 (Paid)","pl":"가입 시 소량의 무료 크레딧 제공하나 금방 소진됨. 실질적으론 월 구독($19~) 필요.","pe":"","id":"galileo","u":"https://www.usegalileo.ai"},{"c":"대학생활","n":"Gamma","i":"카드 뉴스형 PPT 생성","s":"텍스트만으로 디자인된 PPT 자동 생성","w":"디자인의 세밀한 커스터마이징이 어려움","r":"발표 자료의 뼈대와 디자인을 1분 만에 완성할 때","pf":"[Topic] 대학생 발표 주제로 [Tone] 트렌디하고 시각 자료가 풍부한 슬라이드 구성해줘.","p":"Freemium","pl":"크레딧 기반 생성, 유료 시 무제한","pe":"","id":"gamma","u":"https://gamma.app"},{"c":"글쓰기·정리","n":"Gemini","i":"구글 연동 AI","s":"구글 생태계(Docs, Youtube) 연동. 영상 내용을 보지 않고 요약하거나 드라이브 문서를 참조함.","w":"답변이 지나치게 윤리적/보수적이라 창작의 자유도가 떨어질 때가 있음.","r":"자료 조사, 구글 워크스페이스 유저","pf":"멀티모달 프롬프트","p":"Freemium","pl":"Free / Advanced (29,000원/월)","pe":"\"@Youtube 이 영상의 내용을 3줄 요약하고, 언급된 제품의 스펙을 표로 정리해줘.\"","id":"gemini","u":"https://gemini.google.com"},{"c":"번역 & 검색","n":"Genspark","i":"AI 큐레이션 페이지","s":"다중 모델 기반 커스텀 요약 페이지 생성","w":"정보 과부하로 핵심 파악 지연 가능","r":"특정 주제에 대한 종합 시장 조사 리포트 작성 시","pf":"[Objective] 최신 트렌드를 [Format] 비교 표와 타임라인이 포함된 리포트로 요약해줘.","p":"Freemium","pl":"무료 사용 가능, 헤비 유저용 구독제","pe":"","id":"genspark","u":"https://www.genspark.ai"},{"c":"바이브 코딩","n":"GitHub Copilot","i":"코드 보조","s":"가장 방대한 코드 학습량과 IDE 범용성. 주석만 달면 코드를 짜주는 자동완성 기능이 가장 빠르고 안정적.","w":"전체 프로젝트 구조를 이해하고 설계하는 '에이전트' 능력은 Cursor보다 부족함.","r":"Individual($10/월): 개인용\nBusiness($19/월): 기업용, IP 보호, 조직 관리 기능 포함","pf":"주석 기반","p":"유료","pl":"Individual($10/월): 개인용\nBusiness($19/월): 기업용, IP 보호, 조직 관리 기능 포함","pe":"// 함수 설명: 사용자 입력을 받아 이메일 유효성을 검사하고 정규식을 사용하여 true/false를 반환하는 함수 (주석 작성 시 자동완성)","id":"githubcopilot","u":"https://github.com/features/copilot"},{"c":"모델 & 추론","n":"GPT-5 / o1","i":"","s":"복잡한 단계별 추론 및 수학/코딩 정점","w":"답변 도출까지 생각하는 시간이 소요됨","r":"어려운 수학 문제나 고도의 알고리즘 설계 시","pf":"[Constraint] 답을 내기 전 반드시 [Thinking Step] 논리 검증을 거쳐 최종안 제시해줘.","p":"Freemium","pl":"Plus 구독(월 $20) 필수적 수준","pe":"","id":"gpt5o1","u":"https://chat.openai.com"},{"c":"회의·기록","n":"Grain","i":"회의 클립","s":"공유 최적 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"요약 약함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"세일즈","pf":"하이라이트","p":"유료","pl":"팀 플랜","pe":"","id":"grain","u":"https://grain.com"},{"c":"글쓰기·정리","n":"Grok (xAI)","i":"실시간 트렌드 검색","s":"X(트위터)의 실시간 데이터를 바로 검색함. 최신 밈이나 뉴스 반영 속도가 가장 빠름.","w":"별도 무료 버전 없이 X(트위터) 유료 구독이 필요함.","r":"현재 사람들의 반응, 실시간 트렌드, 밈(Meme) 조사.","pf":"[모드 변경] \"재미있는(Fun) 모드로 요즘 유행 설명해줘.\"","p":"유료 (Paid)","pl":"X Premium(월 약 1만원대~) 구독자만 사용 가능. 이미지 생성(Flux) 기능 포함.","pe":"","id":"grok","u":"https://grok.x.ai"},{"c":"아바타 & 비디오","n":"HeyGen","i":"","s":"압도적인 립싱크 및 아바타 모션 품질","w":"고화질 렌더링 시 크레딧 소모가 큼","r":"얼굴 노출 없이 신뢰감 있는 홍보 영상을 만들 때","pf":"[Persona] 아나운서가 [Action] 미소와 손동작을 섞어 발표하는 영상을 만들어줘.","p":"Paid (Trial)","pl":"크레딧 기반 (고가형 서비스)","pe":"","id":"heygen","u":"https://www.heygen.com"},{"c":"캐릭터 챗봇","n":"JanitorAI","i":"","s":"검열 없는 자유로운 대화 및 외부 연동","w":"UI가 다소 조잡하고 자극적인 콘텐츠 위주","r":"창의적 롤플레잉이나 무검열 대화가 필요할 때","pf":"[Identity] 악역으로서 [Constraint] 절대로 내 부탁을 쉽게 들어주지 않는 톤 유지해.","p":"Free/Paid","pl":"자체 모델 무료, 외부 API 사용 시 과금","pe":"","id":"janitorai","u":"https://janitorai.com"},{"c":"유틸리티","n":"Jina Reader","i":"","s":"URL 접두어만으로 간편하게 텍스트 추출","w":"복잡한 인터랙션 사이트 추출 한계","r":"뉴스 기사나 블로그 본문만 깔끔하게 읽어오고 싶을 때","pf":"(URL 앞에 r.jina.ai/를 붙여 Raw Data 확보 후 LLM 입력)","p":"Free","pl":"현재 무료(API 오픈)","pe":"","id":"jinareader","u":"https://jina.ai/reader"},{"c":"영상 생성·편집","n":"Kling","i":"","s":"물리 법칙의 대가: 액체 흐름, 근육 움직임 등 복잡한 물리 구현 및 o1 추론 탑재","w":"","r":"","pf":"","p":"","pl":"","pe":"","id":"kling","u":"https://klingai.com"},{"c":"자동화·AI 에이전트","n":"LangFlow","i":"LLM 플로우","s":"확장성 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"설정 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"연구","pf":"그래프","p":"무료","pl":"오픈소스","pe":"","id":"langflow","u":"https://www.langflow.org"},{"c":"만화·스토리보드","n":"Leonardo","i":"이미지 AI","s":"디자인 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"스토리 약함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"일러스트","pf":"스타일","p":"Freemium","pl":"유료","pe":"","id":"leonardo","u":"https://leonardo.ai"},{"c":"글쓰기·정리","n":"Liner","i":"학술/지식 하이라이트","s":"신뢰할 수 있는 출처(논문 등) 필터링 강력. 형광펜 기능으로 중요 정보 수집.","w":"창작보다는 '수집 및 정리'에 특화됨.","r":"과제 자료 수집, 참고문헌 정리.","pf":"[필터링] \"학술 논문 위주로 검색해줘.\"","p":"부분 유료 (Freemium)","pl":"기본 형광펜/웹 요약 무료. Pro 요금제 사용 시 학술 검색 무제한 및 더 똑똑한 AI 모델 사용 가능.","pe":"","id":"liner","u":"https://getliner.com"},{"c":"로컬 AI","n":"LM Studio","i":"","s":"모델 검색 및 하드웨어 설정 GUI 제공","w":"시스템 자원(VRAM) 점유율이 매우 높음","r":"다양한 오픈소스 모델을 성능에 맞춰 테스트할 때","pf":"[Hardware] 내 GPU 성능에 맞춰 [Setup] 컨텍스트 길이를 최대치로 설정해줘.","p":"Free","pl":"오픈소스 무료","pe":"","id":"lmstudio","u":"https://lmstudio.ai"},{"c":"아바타 & 비디오","n":"Luma Machine","i":"","s":"고퀄리티 비디오 생성 (텍스트/이미지 기반)","w":"물리 법칙 위배(Morphing) 현상 발생 가능","r":"SNS 광고용 임팩트 있는 짧은 영상 소스가 필요할 때","pf":"[Subject] F1 차량 주행 장면을 [Camera] 드론 뷰 시점으로 역동적이게 생성해줘.","p":"Freemium","pl":"일일 무료 생성량 제공 후 유료","pe":"","id":"lumamachine","u":"https://lumalabs.ai"},{"c":"자동화·AI 에이전트","n":"Make","i":"자동화","s":"UI 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"복잡성 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"시나리오","pf":"조건 설정","p":"유료","pl":"구독","pe":"","id":"make","u":"https://www.make.com"},{"c":"시각화 / PPT","n":"Mapify","i":"AI 마인드맵 생성","s":"긴 PDF나 유튜브 영상을 넣으면 구조화된 마인드맵으로 쫙 펼쳐줌.","w":"PPT 슬라이드 형태는 아님.","r":"복잡한 개념 정리, 강의 요약, 브레인스토밍.","pf":"[자료 입력] 유튜브 링크나 파일 업로드가 핵심.","p":"부분 유료 (Credit)","pl":"무료 크레딧(10개) 제공. 이후 유료 구독 필요.","pe":"","id":"mapify","u":"https://mapify.so"},{"c":"이미지 생성","n":"Midjourney","i":"","s":"예술성 1위: 독보적인 화풍과 질감 표현으로 전문 작가들이 가장 선호 (v7 기준)","w":"","r":"","pf":"","p":"","pl":"","pe":"","id":"midjourney","u":"https://www.midjourney.com"},{"c":"음악 생성","n":"Mubert","i":"스트리밍","s":"다양성 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"저작권 이슈 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"배경음","pf":"텍스트","p":"Freemium","pl":"유료","pe":"","id":"mubert","u":"https://mubert.com"},{"c":"자동화·AI 에이전트","n":"n8n","i":"자동화","s":"노드 기반의 시각적 자동화 + 셀프 호스팅 무료. 복잡한 분기 처리와 코딩(Javascript)을 섞어서 정교한 봇 제작 가능.","w":"비개발자가 접근하기에는 초기 서버 설치나 JSON 데이터 구조 이해 등 진입 장벽이 높음.","r":"Self-hosted: 무료 (기능 제한 없음)\nCloud($20/월): 서버 관리 불필요, 월 2.5k 실행","pf":"노드 설계","p":"무료/유료","pl":"Self-hosted: 무료 (기능 제한 없음)\nCloud($20/월): 서버 관리 불필요, 월 2.5k 실행","pe":"(Javascript 노드에서) \"이전 노드에서 받은 JSON 데이터 중 'email' 필드만 추출해서 다음 구글 시트 노드로 넘겨줘.\"","id":"n8n","u":"https://n8n.io"},{"c":"시각화 / PPT","n":"Napkin","i":"텍스트 도식화","s":"글을 복사해 넣으면 심플한 다이어그램(그림)으로 바꿔줌.","w":"전체 슬라이드를 만드는 게 아니라 '삽입용 그림' 제작 툴.","r":"줄글만 있는 장표를 그림으로 요약하고 싶을 때.","pf":"[복사/붙여넣기] 요약하고 싶은 문단을 그대로 입력.","p":"유료 (Trial)","pl":"초기 베타 때는 무료였으나 현재 유료 전환(체험판 제공). 전문가용 도구.","pe":"","id":"napkin","u":"https://www.napkin.ai"},{"c":"대학생활","n":"NotebookLM","i":"","s":"업로드한 소스 내에서만 답변 (정확도)","w":"구글 생태계 외 외부 링크 연동 제한","r":"강의 노트나 서적을 학습하여 퀴즈를 만들 때","pf":"[Data] 강의록 기반으로 [Objective] 예상 질문 10개를 답안과 함께 추출해줘.","p":"Free","pl":"구글 서비스 내 무료 이용 가능","pe":"","id":"notebooklm","u":"https://notebooklm.google.com"},{"c":"글쓰기·정리","n":"Notion AI","i":"문서 생산성 AI","s":"워크스페이스 내장형. 별도 창 이동 없이 문서 내에서 번역, 요약, 톤 앤 매너 수정 가능.","w":"챗봇 자체 지능은 GPT-4 대비 낮음. 복잡한 추론보다 텍스트 가공에 특화.","r":"회의록 정리, 문서 초안 다듬기","pf":"요약 프롬프트","p":"유료","pl":"월 $8~10 (애드온 방식)","pe":"(드래그 후) \"이 글의 어조를 '전문적이고 정중하게' 바꾸고, 오타를 수정해줘.\"","id":"notionai","u":"https://www.notion.so/product/ai"},{"c":"회의·기록","n":"Notta","i":"전사 AI","s":"다국어 지원 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"인지도 낮음 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"글로벌 회의","pf":"언어 지정","p":"Freemium","pl":"유료","pe":"","id":"notta","u":"https://www.notta.ai"},{"c":"만화·스토리보드","n":"NovelAI Image","i":"캐릭터 생성","s":"일관성 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"실사 약함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"캐릭터","pf":"태그형","p":"유료","pl":"구독","pe":"","id":"novelaiimage","u":"https://novelai.net"},{"c":"로컬 AI","n":"Ollama","i":"","s":"간결한 모델 배포 및 로컬 보안성 우수","w":"CLI 환경(터미널) 숙련도가 필요함","r":"보안이 중요한 민감 데이터를 로컬에서 처리할 때","pf":"[System] 너는 로컬 코딩 비서야. [Efficiency] 설명 없이 코드만 출력해.","p":"Free","pl":"오픈소스 무료","pe":"","id":"ollama","u":"https://ollama.com"},{"c":"영상 생성·편집","n":"Opus Clip","i":"쇼츠 AI","s":"자동 분할 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"커스터마이즈 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"유튜브","pf":"하이라이트","p":"유료","pl":"구독","pe":"","id":"opusclip","u":"https://www.opus.pro"},{"c":"회의·기록","n":"Otter.ai","i":"회의 전사","s":"영어권 화자 분리 및 딕테이션 정확도 최상. 줌/구글밋 등 자동 접속 및 슬라이드 캡처 기능 보유.","w":"한국어 인식률이 매우 낮음. 국내 회의용으로는 부적합하며 영어 회의 전용.","r":"Free: 월 300분\nPro($10/월): 월 1200분, 고급 검색 및 요약 기능","pf":"요약 중심","p":"Freemium","pl":"Free: 월 300분\nPro($10/월): 월 1200분, 고급 검색 및 요약 기능","pe":"\"Summarize the key decisions made regarding the Q3 budget from this meeting.\" (영어 전용)","id":"otterai","u":"https://otter.ai"},{"c":"글쓰기·정리","n":"Perplexity","i":"출처 기반 검색 AI","s":"실시간 웹 검색과 정확한 출처(Citation). 답변의 근거가 되는 링크를 즉시 제공하여 팩트 체크 용이.","w":"창의적 글쓰기나 스토리텔링 능력은 약함. 검색어 선정에 따라 품질 좌우.","r":"리서치, 팩트 체크, 최신 동향 파악","pf":"검색어 중심","p":"Freemium","pl":"Free / Pro ($20/월)","pe":"\"2025년 생성형 AI 트렌드 리포트를 검색하고, 시장 규모 수치를 포함해 표로 만들어줘.\"","id":"perplexity","u":"https://www.perplexity.ai"},{"c":"이미지 편집","n":"Photoshop","i":"","s":"업계 표준: '생성형 채우기'와 '확장' 기능이 가장 안정적이며 레이어 기반 편집 최강","w":"","r":"","pf":"","p":"","pl":"","pe":"","id":"photoshop","u":"https://www.adobe.com/products/photoshop.html"},{"c":"영상 생성·편집","n":"Pika","i":"텍스트→영상","s":"애니메이션 및 물리 법칙 표현 우수. 입모양(Lip Sync)을 맞추는 기능과 특정 사물을 영상으로 변환하는 기능 특화.","w":"실사 영상보다는 3D 애니메이션이나 일러스트 풍 영상에서 더 강점을 보임.","r":"Free: 월 30 크레딧\nStandard($10/월): 월 700 크레딧, 워터마크 제거","pf":"장면 지시","p":"Freemium","pl":"Free: 월 30 크레딧\nStandard($10/월): 월 700 크레딧, 워터마크 제거","pe":"\"Image to Video 기능을 사용. (사진 업로드 후) 이 캐릭터가 눈을 깜빡이며 웃는 모습을 자연스럽게 만들어줘.\"","id":"pika","u":"https://pika.art"},{"c":"바이브 코딩","n":"Replit Ghostwriter","i":"온라인 IDE","s":"웹 기반 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"성능 제한 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"학습·프로토","pf":"대화형","p":"Freemium","pl":"Pro 플랜","pe":"","id":"replitghostwriter","u":"https://replit.com"},{"c":"영상 생성·편집","n":"Runway","i":"생성형 영상","s":"가장 진보된 비디오 AI 모델 (Gen-3 Alpha). 모션 브러시로 특정 부분만 움직이게 하는 등 디테일 컨트롤 가능.","w":"생성 속도가 느리고, 고품질 영상을 뽑으려면 크레딧 소모가 매우 커서 비용 부담이 높음.","r":"Free: 125 크레딧(일회성)\nStandard($12/월): 월 625 크레딧, 워터마크 제거, 해상도 업스케일","pf":"묘사형","p":"Freemium","pl":"Free: 125 크레딧(일회성)\nStandard($12/월): 월 625 크레딧, 워터마크 제거, 해상도 업스케일","pe":"\"시네마틱 스타일, 드론 샷. 비 젖은 사이버펑크 도시의 네온사인을 배경으로 천천히 걸어가는 로봇. (Camera Motion: Zoom in)\"","id":"runway","u":"https://runwayml.com"},{"c":"회의·기록","n":"Sembly","i":"회의 인사이트","s":"분석 제공 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"비용 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"회의 분석","pf":"요약 지시","p":"유료","pl":"구독","pe":"","id":"sembly","u":"https://www.sembly.ai"},{"c":"음악 생성","n":"Soundraw","i":"BGM","s":"로열티 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"보컬 없음 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"영상 음악","pf":"분위기","p":"유료","pl":"구독","pe":"","id":"soundraw","u":"https://soundraw.io"},{"c":"바이브 코딩","n":"Sourcegraph Cody","i":"코드 검색 AI","s":"대형 코드베이스 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"개인 과함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"기업 코드","pf":"질문형","p":"유료","pl":"엔터프라이즈","pe":"","id":"sourcegraphcody","u":"https://sourcegraph.com/cody"},{"c":"글쓰기·정리","n":"Storm","i":"심층 리포트 생성기","s":"위키피디아 스타일의 긴 호흡을 가진 전문 보고서를 작성해줌.","w":"생성 시간이 오래 걸리고, 간단한 질문엔 부적합.","r":"딥다이브 주제 연구, 백서(Whitepaper) 초안.","pf":"[주제어] 질문보다는 탐구하고 싶은 '키워드' 입력.","p":"무료 (Research Preview)","pl":"현재 연구용 프리뷰 버전으로 무료 제공.","pe":"","id":"storm","u":"https://storm.genie.stanford.edu"},{"c":"만화·스토리보드","n":"Storyboarder.ai","i":"콘티 AI","s":"대본→콘티 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"표현 제한 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"콘셉트","pf":"장면 요약","p":"유료","pl":"구독","pe":"","id":"storyboarderai","u":"https://storyboarder.ai"},{"c":"글쓰기·정리","n":"Sudowrite","i":"창작 특화 AI","s":"'스토리 바이블' 기능. 등장인물, 세계관 설정을 기억하고 이를 반영하여 소설을 이어씀.","w":"소설 외의 비즈니스 글쓰기나 일반 업무용으로는 부적합함.","r":"웹소설, 시나리오 작가","pf":"플롯 지시","p":"유료","pl":"월 $10~22 (글자 수 제한)","pe":"\"주인공이 위기에 빠지는 장면을 '보여주기(Show, don't tell)' 기법으로 묘사해줘.\"","id":"sudowrite","u":"https://www.sudowrite.com"},{"c":"음악 생성","n":"Suno","i":"노래 생성","s":"보컬 포함 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"편집 한계 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"BGM","pf":"장르 지시","p":"Freemium","pl":"유료","pe":"","id":"suno","u":"https://suno.com"},{"c":"아바타 & 비디오","n":"Synthesia","i":"","s":"기업 교육용 템플릿 및 다국어 지원 풍부","w":"창의적 연출보다 다소 정형화된 느낌","r":"사내 교육용 가이드나 정보 전달형 영상을 만들 때","pf":"[Context] 온보딩 영상이야. [Format] 1인칭 시점의 가이드 대사를 아바타에 입혀줘.","p":"Paid","pl":"월 구독형(개인/기업)","pe":"","id":"synthesia","u":"https://www.synthesia.io"},{"c":"바이브 코딩","n":"Tabnine","i":"코드 추천","s":"보안 강점 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"맥락 약함 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"기업 개발","pf":"짧은 지시","p":"Freemium","pl":"팀 플랜","pe":"","id":"tabnine","u":"https://www.tabnine.com"},{"c":"회의·기록","n":"tl;dv","i":"하이라이트","s":"무료 버전의 기능이 매우 강력함. 회의 녹화 무제한 및 타임스탬프 기능, 노션/슬랙 연동 우수.","w":"화상 회의 툴(Zoom, Meet, Teams)에 봇이 들어와야만 작동함 (파일 업로드 제한적).","r":"Free: 녹화/대본 무제한\nPro($20/월): CRM 연동, AI 요약 템플릿 커스텀, 클립 다운로드","pf":"핵심 요청","p":"Freemium","pl":"Free: 녹화/대본 무제한\nPro($20/월): CRM 연동, AI 요약 템플릿 커스텀, 클립 다운로드","pe":"\"영업 미팅 중 고객이 '가격'에 대해 언급한 구간만 찾아서 클립으로 따고, 슬랙 채널에 공유해줘.\"","id":"tldv","u":"https://tldv.io"},{"c":"음악 생성","n":"Udio","i":"노래 생성","s":"편집 가능 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"UI 복잡 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"곡 제작","pf":"구조 지시","p":"Freemium","pl":"유료","pe":"","id":"udio","u":"https://www.udio.com"},{"c":"웹 / UI / UX","n":"Uizard","i":"스케치 to 디자인","s":"손으로 그린 낙서를 찍어 올리면 앱 디자인으로 변환.","w":"복잡한 인터랙션 구현은 한계가 있음.","r":"기획자가 아이디어를 빠르게 시각화할 때.","pf":"[이미지 업로드] 텍스트보다 손그림 인식이 핵심.","p":"부분 유료 (Freemium)","pl":"무료는 프로젝트 2개까지 생성 가능. 유료($12/월)부터 화면 내보내기 및 템플릿 제한 해제.","pe":"","id":"uizard","u":"https://uizard.io"},{"c":"음성 합성","n":"Veed.io","i":"","s":"영상 편집과 음성 합성 동시 처리 가능","w":"전문 오디오 툴 대비 정밀 설정 부족","r":"영상 편집과 나레이션을 한 번에 빠르게 해결할 때","pf":"[Scenario] 쇼츠용 대본이야. [Action] 타이밍에 맞춰 배경음과 목소리를 합성해줘.","p":"Freemium","pl":"워터마크 제거 시 유료 구독","pe":"","id":"veedio","u":"https://www.veed.io"},{"c":"영상 생성·편집","n":"Vrew","i":"자막 AI","s":"한국어 음성 인식 및 자막 생성 독보적. 영상을 텍스트 문서 편집하듯 자르고 붙이는 '워드 프로세서' 방식 편집.","w":"전문적인 영상 효과(화려한 트랜지션, 색보정 등)를 주기에는 기능이 제한적임.","r":"Free: 월 120분 음성분석\nLight(9,900원/월): 월 600분, 워터마크 제거","pf":"자동 컷","p":"Freemium","pl":"Free: 월 120분 음성분석\nLight(9,900원/월): 월 600분, 워터마크 제거","pe":"(대본 입력 후) \"이 대본에 어울리는 무료 이미지와 영상을 자동으로 매칭해서 쇼츠 영상으로 만들어줘.\"","id":"vrew","u":"https://vrew.voyagerx.com"},{"c":"웹 / UI / UX","n":"Wegic","i":"대화형 웹 빌더","s":"채팅으로 \"여기 색깔 바꿔줘\", \"사진 넣어줘\" 하면 실시간으로 웹사이트 수정.","w":"아주 복잡한 기능(쇼핑몰 결제 등) 구현은 제한적.","r":"코딩 모르는 사람이 개인 홈페이지 만들 때.","pf":"[대화형] \"헤더 배경을 검은색으로 바꾸고 로고 키워줘.\"","p":"부분 유료 (Credit)","pl":"초기 무료 크레딧 제공. 이후 AI 수정 명령 횟수에 따라 과금.","pe":"","id":"wegic","u":"https://wegic.ai"},{"c":"영상 생성·편집","n":"Wisecut","i":"자동 편집","s":"무음 제거 실제 사용자 기준으로 학습 곡선이 비교적 완만하며, 단독 사용뿐 아니라 다른 AI 툴과 병행했을 때 시너지가 큼. 콘텐츠 제작, 업무 자동화, 실험적 프로젝트 등 다양한 맥락에서 재사용성이 높다는 점도 강점.","w":"연출 부족 초기 설정이나 사용 방식에 익숙해지기까지 시행착오가 발생할 수 있음. 또한 고급 활용을 위해서는 사용자의 기획력이나 도메인 이해도가 일정 수준 이상 요구됨.","r":"브이로그","pf":"자동 편집","p":"Freemium","pl":"유료","pe":"","id":"wisecut","u":"https://www.wisecut.video"},{"c":"글쓰기·정리","n":"Writer.com","i":"기업용 AI","s":"브랜드 보이스(Brand Voice) 통일. 기업 고유 용어와 톤을 학습시켜 팀 전체 글쓰기 표준화.","w":"개인 사용자가 쓰기에는 가격과 기능이 과하고 설정이 복잡함.","r":"마케팅 팀, 대기업 홍보실","pf":"가이드 기반","p":"유료","pl":"Team ($18/월/인)","pe":"\"우리 회사의 '친환경 가이드라인'에 맞춰 이 보도자료의 톤을 수정해줘.\"","id":"writercom","u":"https://writer.com"},{"c":"자동화·AI 에이전트","n":"Zapier","i":"자동화","s":"가장 많은 연동 앱(6,000개+) 보유. 코딩 없이 'If This Then That' 논리로 누구나 쉽게 연결 가능.","w":"데이터 처리량이 늘어나면 비용이 기하급수적으로 증가(비쌈). 복잡한 로직 구현 어려움.","r":"Free: 월 100 태스크\nStarter($19.99/월): 월 750 태스크, 다단계(Multi-step) 잽 생성 가능","pf":"트리거","p":"Freemium","pl":"Free: 월 100 태스크\nStarter($19.99/월): 월 750 태스크, 다단계(Multi-step) 잽 생성 가능","pe":"(AI Builder 사용) \"지메일로 '송장'이라는 단어가 포함된 메일이 오면, 첨부파일을 드라이브에 저장하고 슬랙으로 알림을 보내줘.\"","id":"zapier","u":"https://zapier.com"}];
+
+const catIcons={"글쓰기·정리": "✍️", "대학생활": "🎓", "로컬 AI": "🖥️", "만화·스토리보드": "🎨", "모델 & 추론": "🧠", "바이브 코딩": "💻", "번역 & 검색": "🔍", "시각화 / PPT": "📊", "아바타 & 비디오": "🎭", "영상 생성·편집": "🎬", "웹 / UI / UX": "🌐", "유틸리티": "🔧", "음성 합성": "🎙️", "음악 생성": "🎵", "이미지 생성": "🖼️", "이미지 편집": "✂️", "자동화·AI 에이전트": "🤖", "캐릭터 챗봇": "💬", "회의·기록": "📝"};
+
+const cats=[...new Set(D.map(d=>d.c))].sort();
+let cur=cats[0];
+
+document.getElementById('totalTools').textContent=D.length;
+document.getElementById('totalCats').textContent=cats.length;
+
+function logoUrl(id){
+  const t=D.find(d=>d.id===id);
+  if(t&&t.u&&t.u!=='#'){
+    try{
+      const domain=new URL(t.u).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+    }catch(e){}
+  }
+  return '';
+}
+
+function logoFallback(name){
+  return name.charAt(0).toUpperCase();
+}
+
+function renderCats(){
+  const el=document.getElementById('cats');
+  el.innerHTML=cats.map(c=>{
+    const count=D.filter(d=>d.c===c).length;
+    const icon=catIcons[c]||'📌';
+    return `<button class="cat-btn${c===cur?' active':''}" data-c="${c}">${icon} ${c} <span class="cnt">${count}</span></button>`;
+  }).join('');
+  el.querySelectorAll('.cat-btn').forEach(b=>{
+    b.onclick=()=>{
+      cur=b.dataset.c;
+      renderCats();
+      renderGrid();
+    };
+  });
+}
+
+function renderGrid(){
+  const el=document.getElementById('grid');
+  const tools=D.filter(d=>d.c===cur);
+  el.className='grid appear';
+  el.innerHTML=tools.map((t,i)=>{
+    const imgSrc=logoUrl(t.id);
+    return `<button class="tool-btn" data-idx="${D.indexOf(t)}" style="animation-delay:${i*30}ms">
+      <div class="t-logo">
+        <img src="${imgSrc}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="fb" style="display:none">${logoFallback(t.n)}</span>
+      </div>
+      <div class="t-info">
+        <h3>${t.n}</h3>
+        ${t.i?`<div class="sub">${t.i}</div>`:''}
+      </div>
+    </button>`;
+  }).join('');
+  el.querySelectorAll('.tool-btn').forEach(b=>{
+    b.onclick=()=>openDetail(parseInt(b.dataset.idx));
+  });
+}
+
+function openDetail(idx){
+  const t=D[idx];
+  const imgSrc=logoUrl(t.id);
+
+  document.getElementById('pLogo').innerHTML=
+    `<img src="${imgSrc}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+     <span class="fb" style="display:none">${logoFallback(t.n)}</span>`;
+  document.getElementById('pName').textContent=t.n;
+  document.getElementById('pId').textContent=t.i||t.c;
+  document.getElementById('visitBtn').href=t.u||'#';
+
+  let html='';
+
+  if(t.s){
+    html+=`<div class="sec">
+      <div class="lbl"><span class="dot" style="background:#22d3b8"></span>강점</div>
+      <div class="val">${t.s}</div>
+    </div>`;
+  }
+
+  if(t.w){
+    html+=`<div class="sec">
+      <div class="lbl"><span class="dot" style="background:#f472b6"></span>약점</div>
+      <div class="val">${t.w}</div>
+    </div>`;
+  }
+
+  if(t.r){
+    html+=`<div class="sec">
+      <div class="lbl"><span class="dot" style="background:#fbbf24"></span>추천 상황</div>
+      <div class="val">${t.r}</div>
+    </div>`;
+  }
+
+  html+='<div class="sec"><div class="lbl">💰 가격 & 프롬프트</div><div class="tags">';
+  if(t.p) html+=`<span class="tag price">${t.p}</span>`;
+  if(t.pf) html+=`<span class="tag prompt">${t.pf}</span>`;
+  html+='</div></div>';
+
+  if(t.pl){
+    html+=`<div class="sec">
+      <div class="lbl"><span class="dot" style="background:#7c6aef"></span>요금제 특징</div>
+      <div class="val">${t.pl}</div>
+    </div>`;
+  }
+
+  if(t.pe){
+    html+=`<div class="sec">
+      <div class="lbl"><span class="dot" style="background:#60a5fa"></span>실전 프롬프트 예시</div>
+      <div class="val" style="font-size:13.5px;font-style:italic;color:#a0a0c0">${t.pe}</div>
+    </div>`;
+  }
+
+  if(t.pf && t.pf.length > 5){
+    html+=`<div class="sec">
+      <div class="lbl"><span class="dot" style="background:#f472b6"></span>프롬프트 특징</div>
+      <div class="val">${t.pf}</div>
+    </div>`;
+  }
+
+  document.getElementById('pBody').innerHTML=html;
+  document.getElementById('ov').classList.add('show');
+  document.getElementById('panel').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeDetail(){
+  document.getElementById('ov').classList.remove('show');
+  document.getElementById('panel').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+document.getElementById('ov').onclick=closeDetail;
+document.getElementById('closeBtn').onclick=closeDetail;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail()});
+
+renderCats();
+renderGrid();
+</script>
+</body>
+</html>
